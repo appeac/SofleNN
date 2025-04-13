@@ -1,0 +1,386 @@
+/*
+ * Copyright (c) 2022 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+#include <behaviors/num_word.dtsi>
+
+#define DEF 0
+#define NBR 1
+#define NAV 2
+#define FNC 3
+
+#define KEYS_L 0 1 3 4 5 6 12 13 14 15 16 17 24 25 26 27 28 29 
+#define KEYS_R 6 7 8 9 10 11 18 19 20 21 22 23 30 31 32 33 34 35 
+#define KEYS_T 36 37 38 39 40 41 42 43 44 45 46 47
+#define KEYS_SH 0 2 5 25 26 27 28 
+
+#define HM_TAPPING_TERM 200
+#define HM_TAPPING_TERM_FAST 150
+#define HM_PRIOR_IDLE 75
+
+
+/ {
+	behaviors {
+
+		td_cw: tap_dance_cw {
+            compatible = "zmk,behavior-tap-dance";
+            #binding-cells = <0>;
+            tapping-term-ms = <200>;
+            bindings = <&mt LSHIFT &caps_word>, <&kp CAPS>;
+        };	
+		
+		tabesc: tab_escape {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp TAB>, <&kp ESC>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+		
+		bksp_del: bksp_del {
+            compatible = "zmk,behavior-mod-morph";
+            #binding-cells = <0>;
+            bindings = <&kp BKSP>, <&kp DEL>;
+            mods = <(MOD_LSFT|MOD_RSFT)>;
+        };
+
+        // Positional Homerow mods
+        // Homerow mods that prevent accidental activations when rolling keys,
+        // such as when typing `st` or `ne` on colemak-dh layouts or `as` on
+        // qwerty.
+        //
+        // Works by only allowing a mod to activate within tapping-term if
+        // it's on the opposite side of the keyboard or on the same side thumb
+        // keys.
+
+        // Further optimization using urob's timerless homerow mods method:
+        // https://github.com/urob/zmk-config#timeless-homerow-mods
+
+        hm_l: homerow_mods_left {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&kp>,  <&kp>;
+
+            flavor = "balanced";
+            tapping-term-ms = <HM_TAPPING_TERM>;
+            quick-tap-ms = <175>;                // repeat on tap-into-hold
+            require-prior-idle-ms = <HM_PRIOR_IDLE>;
+
+            hold-trigger-key-positions = <KEYS_R KEYS_T KEYS_SH 14>;
+            hold-trigger-on-release;
+        };
+
+        hm_r: homerow_mods_right {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
+
+            flavor = "balanced";
+            tapping-term-ms = <HM_TAPPING_TERM>;
+            quick-tap-ms = <175>;
+            require-prior-idle-ms = <HM_PRIOR_IDLE>;
+
+            hold-trigger-key-positions = <KEYS_L KEYS_T>;
+            hold-trigger-on-release;
+        };
+
+
+        // Positional Homerow mods for shift
+        // Use faster tapping term and disable some features that may
+        // cause false negatives.
+
+        hm_shift_l: hm_shift_l {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
+
+            flavor = "balanced";
+            tapping-term-ms = <HM_TAPPING_TERM_FAST>;
+            quick-tap-ms = <175>;
+            require-prior-idle-ms = <HM_PRIOR_IDLE>;
+
+            hold-trigger-key-positions = <KEYS_R KEYS_T>;
+            // hold-trigger-on-release;
+        };
+
+        hm_shift_r: hm_shift_r {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
+
+            flavor = "balanced";
+            tapping-term-ms = <HM_TAPPING_TERM_FAST>;
+            quick-tap-ms = <175>;
+            require-prior-idle-ms = <HM_PRIOR_IDLE>;
+
+            hold-trigger-key-positions = <KEYS_L KEYS_T>;
+            // hold-trigger-on-release;
+        };
+
+        /*
+         * Non-Positional Homerow Mods
+         * Used for &mm_grescm_gui behavior on left hand.
+         *
+         * Usage: &hm LSHFT T
+         * Tap: T
+         * Tap-Tap-Hold: Repeat T
+         * Hold: LSHIFT
+         */
+
+        hm: homerow_mods {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            bindings = <&kp>, <&kp>;
+
+            flavor = "balanced";
+            tapping-term-ms = <HM_TAPPING_TERM>;
+            quick-tap-ms = <200>;
+        };
+    };
+	
+	macros {
+        m_ctrl_bcps: m_ctrl_bcps {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_press &kp LCTRL>
+                , <&macro_tap &kp BSPC>
+                , <&macro_release &kp LCTRL>
+				;
+        };
+		
+		m_parens: m_parens {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_tap &kp LPAR>
+                , <&macro_tap &kp RPAR>
+                , <&macro_tap &kp LEFT>				
+				;
+        };
+		
+		m_crlybs: m_crlybs {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_tap &kp LBRC>
+                , <&macro_tap &kp RBRC>
+                , <&macro_tap &kp LEFT>
+				;
+        };
+		
+		m_sqbs: m_sqbs {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_tap &kp LBKT>
+                , <&macro_tap &kp RBKT>
+                , <&macro_tap &kp LEFT>
+				;
+        };
+		
+		m_ltgt: m_ltbt {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_tap &kp LT>
+                , <&macro_tap &kp GT>
+                , <&macro_tap &kp LEFT>
+				;
+        };
+		
+		m_dqt: m_dqt {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings
+                = <&macro_tap &kp DQT>
+                , <&macro_tap &kp DQT>
+                , <&macro_tap &kp LEFT>
+				;
+        };
+    };
+	
+	combos {
+        compatible = "zmk,combos";
+		
+		combo_caps {
+			timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <28 31>; // Positions of the keys in the matrix
+            bindings = <&caps_word>; // Output when combo is triggered
+        };
+
+        combo_ctrl_bspc {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <22 23>; // Positions of the keys in the matrix
+            bindings = <&kp LC(BSPC)>; // Output when combo is triggered
+        };
+		
+		combo_soft_off {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <50 59>; // Positions of the keys in the matrix
+            bindings = <&soft_off>; // Output when combo is triggered
+        };
+		
+		combo_tilde {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <0 1>; // Positions of the keys in the matrix
+            bindings = <&kp TILDE>; // Output when combo is triggered
+        };
+		
+		combo_excl {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <12 13>; // Positions of the keys in the matrix
+            bindings = <&kp EXCL>; // Output when combo is triggered
+        };
+		
+		combo_at {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <13 14>; // Positions of the keys in the matrix
+            bindings = <&kp AT>; // Output when combo is triggered
+        };
+		
+		combo_hash {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <14 15>; // Positions of the keys in the matrix
+            bindings = <&kp HASH>; // Output when combo is triggered
+        };
+		
+		combo_dollar {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <15 16>; // Positions of the keys in the matrix
+            bindings = <&kp DOLLAR>; // Output when combo is triggered
+        };
+		
+		combo_perc {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <16 17>; // Positions of the keys in the matrix
+            bindings = <&kp PERCENT>; // Output when combo is triggered
+        };
+		
+		combo_caret {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <17 18>; // Positions of the keys in the matrix
+            bindings = <&kp CARET>; // Output when combo is triggered
+        };
+		
+		combo_amps {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <18 19>; // Positions of the keys in the matrix
+            bindings = <&kp AMPS>; // Output when combo is triggered
+        };
+		
+		combo_star {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <19 20>; // Positions of the keys in the matrix
+            bindings = <&kp STAR>; // Output when combo is triggered
+        };
+		
+		combo_lpar {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <20 21>; // Positions of the keys in the matrix
+            bindings = <&kp LPAR>; // Output when combo is triggered
+        };
+		
+		combo_rpar {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <21 22>; // Positions of the keys in the matrix
+            bindings = <&kp RPAR>; // Output when combo is triggered
+        };
+		
+		combo_bootloader {
+            timeout-ms = <25>; // Detection window in milliseconds
+            key-positions = <0 11 50 59>; // Positions of the keys in the matrix
+            bindings = <&bootloader>; // Output when combo is triggered
+        };
+				
+		combo_leftpar {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <21 22>; // Positions of the keys in the matrix
+            bindings = <&kp LPAR>; // Output when combo is triggered
+        };
+				
+		combo_rightpar {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <22 23>; // Positions of the keys in the matrix
+            bindings = <&kp RPAR>; // Output when combo is triggered
+        };
+		
+		combo_leftbrc {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <33 34>; // Positions of the keys in the matrix
+            bindings = <&kp LBRC>; // Output when combo is triggered
+        };
+		
+		combo_rightbrc {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <34 35>; // Positions of the keys in the matrix
+            bindings = <&kp RBRC>; // Output when combo is triggered
+        };
+		
+		combo_leftbrk {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <45 46>; // Positions of the keys in the matrix
+            bindings = <&kp LBKT>; // Output when combo is triggered
+        };
+		
+		combo_rightbrk {
+            timeout-ms = <50>; // Detection window in milliseconds
+            key-positions = <46 47>; // Positions of the keys in the matrix
+            bindings = <&kp RBKT>; // Output when combo is triggered
+        };
+    };
+	
+    keymap {
+        compatible = "zmk,keymap";
+
+        default_layer {
+            bindings = <
+                &none       &kp N1         &kp N2         &kp N3          &kp N4                  &kp N5                     &kp N6          &kp N7                  &kp N8           &kp N9        &kp N0            &bksp_del
+                &tabesc     &kp Q          &kp W          &kp E           &kp R       	          &kp T                 	 &kp Y     	     &kp U                   &kp I            &kp O         &kp P       	  &bksp_del
+                &kp TAB     &hm_l LGUI A   &hm_l LALT S   &hm_l LCTRL D   &hm_shift_l LSHIFT F    &kp G   	                 &kp H           &hm_shift_r RSHIFT J    &hm_r RCTRL K    &hm_r LALT L  &hm_r RGUI SEMI   &kp SQT
+                &none       &kp Z          &kp X          &kp C           &kp V      	          &kp B  &kp C_MUTE  &none   &kp N     	     &kp M                   &kp COMMA        &kp DOT  	    &kp SLASH  	      &kp DEL
+                            &none          &none          &mo FNC         &num_word NBR           &lt NBR SPACE              &lt NAV ENTER   &none                   &kp RALT         &kp C_VOL_DN  &kp C_VOL_UP      
+            >;
+             sensor-bindings = <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN >;
+        };
+
+        number_layer {
+            bindings = <
+                &trans      &trans      &trans         &trans          &trans                  &trans                      &kp KP_NUM      &kp N7   &kp N8   &kp N9   &kp MINUS      &kp BSPC
+                &trans      &trans      &kp N7         &kp N8          &kp N9                  &trans                      &kp KP_ASTERISK &kp N4   &kp N5   &kp N6   &kp EQUAL      &kp BSLH
+                &trans      &trans      &hm_l LALT N4  &hm_l LCTRL N5  &hm_shift_l LSHIFT N6   &trans                      &kp KP_SLASH    &kp N1   &kp N2   &kp N3   &m_parens      &m_sqbs
+                &trans      &trans      &kp N1         &kp N2          &kp N3           	   &trans   &trans &trans      &trans          &kp N0   &kp DOT  &kp DOT  &m_ltgt        &m_crlybs
+                            &trans      &trans         &trans          &trans      			   &trans                      &trans          &trans   &trans   &trans   &trans           
+			>;
+             sensor-bindings = <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN >;
+        };
+
+        nav_layer {
+            bindings = <
+                &trans  &trans  &trans  &trans  &trans  &trans                 &trans     &trans    &trans    &trans     &trans   &trans
+				&trans  &trans  &trans  &trans  &trans  &trans                 &kp HOME   &kp END   &kp UP    &trans     &trans   &trans
+				&trans  &trans  &trans  &trans  &trans  &trans                 &kp PG_UP  &kp LEFT  &kp DOWN  &kp RIGHT  &trans   &trans
+				&trans  &trans  &trans  &trans  &trans  &trans  &trans &trans  &kp PG_DN  &trans    &trans    &trans     &trans   &trans
+				        &trans  &trans  &trans  &trans  &trans                 &trans     &trans    &trans    &trans     &trans  
+            >;
+             sensor-bindings = <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN >;
+        };
+
+        function_layer {
+            bindings = <
+                &trans        &trans        &trans          &trans          &trans          &trans          &trans      &trans      &trans      &trans   &trans      &trans
+                &bt BT_CLR    &trans        &trans          &trans          &trans          &trans          &trans      &kp F10     &kp F11     &kp F12  &trans      &trans
+                &trans        &trans        &trans          &trans          &trans          &trans          &trans      &kp F7      &kp F8      &kp F9   &trans      &trans
+                &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2    &bt BT_SEL 3    &bt BT_SEL 4    &trans  		&trans      &kp F4      &kp F5      &kp F6   &trans      &trans
+                              &out OUT_BLE  &out OUT_USB    &out OUT_TOG    &trans          &trans          &trans      &kp F1      &kp F2      &kp F3   &trans      
+            >;
+
+            <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN >;
+        };
+    };
+};
