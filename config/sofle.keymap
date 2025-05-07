@@ -294,7 +294,7 @@
 		
 		combo_bootloaderL {
             timeout-ms = <25>; // Detection window in milliseconds
-            key-positions = <0 12 24 36; // Positions of the keys in the matrix
+            key-positions = <0 12 24 36>; // Positions of the keys in the matrix
             bindings = <&bootloader>; // Output when combo is triggered
         };
 
