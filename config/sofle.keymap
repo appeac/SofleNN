@@ -21,8 +21,8 @@
 #define KEYS_SH 0 2 5 25 26 27 28 
 
 #define HM_TAPPING_TERM 200
-#define HM_TAPPING_TERM_FAST 150
-#define HM_PRIOR_IDLE 75
+#define HM_TAPPING_TERM_FAST 100
+#define HM_PRIOR_IDLE 100
 
 
 / {
@@ -66,7 +66,7 @@
             #binding-cells = <2>;
             bindings = <&kp>,  <&kp>;
 
-            flavor = "balanced";
+            flavor = "tap-preferred";
             tapping-term-ms = <HM_TAPPING_TERM>;
             quick-tap-ms = <175>;                // repeat on tap-into-hold
             require-prior-idle-ms = <HM_PRIOR_IDLE>;
@@ -294,7 +294,7 @@
 		
 		combo_bootloaderL {
             timeout-ms = <25>; // Detection window in milliseconds
-            key-positions = <0 12 24 36>; // Positions of the keys in the matrix
+            key-positions = <0 12 24 36; // Positions of the keys in the matrix
             bindings = <&bootloader>; // Output when combo is triggered
         };
 
@@ -350,7 +350,7 @@
                 &tabesc     &kp Q          &kp W          &kp E           &kp R       	          &kp T                 	 &kp Y     	     &kp U                   &kp I            &kp O         &kp P       	  &bksp_del
                 &kp TAB     &hm_l LGUI A   &hm_l LALT S   &hm_l LCTRL D   &hm_shift_l LSHIFT F    &kp G   	                 &kp H           &hm_shift_r RSHIFT J    &hm_r LCTRL K    &hm_r LALT L  &hm_r RGUI SEMI   &kp SQT
                 &none       &kp Z          &kp X          &kp C           &kp V      	          &kp B  &kp C_MUTE  &none   &kp N     	     &kp M                   &kp COMMA        &kp DOT  	    &kp SLASH  	      &kp DEL
-                            &mo FNC           &none          &num_word NBR   &lt NBR SPACE           &kp LGUI                   &kp RALT           &lt NAV ENTER           &kp RALT         &kp C_VOL_DN  &kp C_VOL_UP      
+                            &mo FNC           &kp LALT          &kp LALT     &lt NBR SPACE           &kp LGUI                   &kp RALT           &lt NAV ENTER           &kp RALT         &kp C_VOL_DN  &kp C_VOL_UP      
             >;
              sensor-bindings = <&inc_dec_kp PG_UP PG_DN &inc_dec_kp C_VOL_UP C_VOL_DN >;
         };
