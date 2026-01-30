@@ -349,7 +349,7 @@
                 &kp TILDE   &kp N1         &kp N2         &kp N3          &kp N4                  &kp N5                     &kp N6          &kp N7                  &kp N8           &kp N9        &kp N0            &bksp_del
                 &tabesc     &kp Q          &kp W          &kp E           &kp R       	          &kp T                 	 &kp Y     	     &kp U                   &kp I            &kp O         &kp P       	  &bksp_del
                 &kp TAB     &hm_l LGUI A   &hm_l LALT S   &hm_l LCTRL D   &hm_shift_l LSHIFT F    &kp G   	                 &kp H           &hm_shift_r RSHIFT J    &hm_r LCTRL K    &hm_r LALT L  &hm_r RGUI SEMI   &kp SQT
-                &none       &kp Z          &kp X          &kp C           &kp V      	          &kp B &kp C_PP &kp C_MUTE  &kp N     	     &kp M                   &kp COMMA        &kp DOT  	    &kp SLASH  	      &kp DEL
+                &kp LCTRL   &kp Z          &kp X          &kp C           &kp V      	          &kp B &kp C_PP &kp C_MUTE  &kp N     	     &kp M                   &kp COMMA        &kp DOT  	    &kp SLASH  	      &kp DEL
                             &mo FNC           &kp LALT          &kp LALT     &lt NBR SPACE           &kp LGUI                   &kp RALT           &lt NAV ENTER           &kp RALT         &kp C_VOL_DN  &kp C_VOL_UP      
             >;
              sensor-bindings = <&inc_dec_kp C_PREV C_NEXT &inc_dec_kp C_VOL_UP C_VOL_DN >;
